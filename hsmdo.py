@@ -206,12 +206,22 @@ def run_hsmdo_model(prepared_data, holdout_months):
     # Запуск MCMC симуляции
     print("Запуск MCMC сэмплирования... Это может занять много времени.")
     fit = model.sample(
-        data=data_dict, chains=4, iter_warmup=1000, iter_sampling=2000,
-        seed=42, show_progress=True
+    data=data_dict, 
+    chains=4, 
+    iter_warmup=500,      # Уменьшить с 1000 до 500
+    iter_sampling=1000,   # Уменьшить с 2000 до 1000
+    seed=42, 
+    show_progress=True,
+    parallel_chains=2     # тут было 4 изначально
     )
     
     print("Сэмплирование завершено.")
-    os.remove(stan_file)
+    #os.remove(stan_file)
+
+    # R_hat должен быть меньше 1.1
+    summary_df = fit.summary()
+    print(summary_df[['R_hat', 'Mean', 'SD']])
+
     
     return fit
 
