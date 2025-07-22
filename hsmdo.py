@@ -189,7 +189,7 @@ def run_hsmdo_model(prepared_data, holdout_months):
     data_dict = {
         "N": len(prepared_data['x_cal']), "K": 12, "T": prepared_data['T_cal'],
         "F": holdout_months, "k": k_vector,
-        "x": prepared_data['x_cal'].values.astype(int),
+        "x": prepared_data['x_cal'].fillna(0).astype(int).values,
         "t": prepared_data['t_cal'].values.astype(int)
     }
 
