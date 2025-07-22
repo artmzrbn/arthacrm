@@ -4,6 +4,7 @@ from cmdstanpy import install_cmdstan
 install_cmdstan()
 from cmdstanpy import CmdStanModel
 import os
+import time
 
 
 # =============================================================================
@@ -274,6 +275,9 @@ def profile_and_segment_customers(fit_results, prepared_data):
 # ГЛАВНЫЙ БЛОК ДЛЯ ЗАПУСКА
 # =============================================================================
 if __name__ == '__main__':
+    # Запуск таймера
+    start_time = time.time()
+    
     # Параметры
     HOLDOUT_MONTHS = 6
     # Укажите дату, на которую проводится анализ. Если None, будет взята последняя дата из данных.
@@ -332,3 +336,19 @@ if __name__ == '__main__':
     # сохранение файла с сегментами
     final_segments_df.to_csv('hsmdo_customer_segments.csv', encoding='utf-8-sig')
     print("\nИтоговая сегментация сохранена в файл: hsmdo_customer_segments.csv")
+    
+    # Вывод времени работы
+    end_time = time.time()
+    execution_time = end_time - start_time
+    hours = int(execution_time // 3600)
+    minutes = int((execution_time % 3600) // 60)
+    seconds = int(execution_time % 60)
+    
+    print(f"\n--- Время выполнения скрипта ---")
+    if hours > 0:
+        print(f"Общее время: {hours} ч {minutes} мин {seconds} сек")
+    elif minutes > 0:
+        print(f"Общее время: {minutes} мин {seconds} сек")
+    else:
+        print(f"Общее время: {seconds} сек")
+    print(f"Точное время: {execution_time:.2f} секунд")
