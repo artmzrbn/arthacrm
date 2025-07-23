@@ -212,7 +212,7 @@ def run_hsmdo_model(prepared_data, holdout_months):
     iter_sampling=1000,   # Уменьшить с 2000 до 1000
     seed=42, 
     show_progress=True,
-    parallel_chains=2     # тут было 4 изначально
+    parallel_chains=4     
     )
     
     print("Сэмплирование завершено.")
@@ -220,7 +220,34 @@ def run_hsmdo_model(prepared_data, holdout_months):
 
     # R_hat должен быть меньше 1.1
     summary_df = fit.summary()
-    print(summary_df[['R_hat', 'Mean', 'SD']])
+    
+    # Выводим статистики в формате ключ-значение
+    print("\n--- Сводная статистика модели ---")
+    print(f"Количество параметров: {len(summary_df)}")
+    
+    # Выводим основные параметры модели (не все, так как их может быть очень много)
+    important_params = ['r', 'alpha', 'phi_c', 'phi_mu', 'tau_s', 'tau_beta']
+    print("\nОсновные параметры модели:")
+    
+    for param in important_params:
+        if param in summary_df.index:
+            row = summary_df.loc[param]
+            print(f"{param}:")
+            for col_name, value in row.items():
+                print(f"  {col_name}: {value}")
+            print()
+    
+    # Проверяем сходимость (R_hat должен быть < 1.1)
+    rhat_col = next((col for col in summary_df.columns if 'hat' in col.lower()), None)
+    if rhat_col:
+        max_rhat = summary_df[rhat_col].max()
+        print(f"Максимальное значение {rhat_col}: {max_rhat}")
+        if max_rhat < 1.1:
+            print("✓ Модель сошлась успешно (все значения < 1.1)")
+        else:
+            print("⚠ Внимание: модель может не полностью сойтись (есть значения >= 1.1)")
+    else:
+        print("Информация о сходимости недоступна")
 
     
     return fit
