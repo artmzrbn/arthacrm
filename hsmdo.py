@@ -206,17 +206,18 @@ def run_hsmdo_model(prepared_data, holdout_months):
     # Запуск MCMC симуляции
     print("Запуск MCMC сэмплирования... Это может занять много времени.")
     fit = model.sample(
-    data=data_dict, 
-    chains=4, 
-    iter_warmup=500,      # Уменьшить с 1000 до 500
-    iter_sampling=1000,   # Уменьшить с 2000 до 1000
-    seed=42, 
-    show_progress=True,
-    parallel_chains=4     
+        data=data_dict, 
+        chains=4, 
+        iter_warmup=500,      # Уменьшено с 1000 до 500 для ускорения
+        iter_sampling=1000,   # Уменьшено с 2000 до 1000 для ускорения
+        seed=42, 
+        show_progress=True,
+        parallel_chains=4,     # Параллельное выполнение цепей для ускорения — тут типа можно до 2 уменьшить, если R_hat < 1.1
+        threads_per_chain=4  # Stan по умолчанию не использует многопоточность, но можно это включить
     )
     
     print("Сэмплирование завершено.")
-    #os.remove(stan_file)
+    os.remove(stan_file)
 
     # R_hat должен быть меньше 1.1
     summary_df = fit.summary()
@@ -329,6 +330,7 @@ if __name__ == '__main__':
     
     # # Пример загрузки вашего файла CSV
     # # Убедитесь, что в файле есть колонки 'order_date', 'name', 'order_id'
+    # df_raw = pd.read_csv('cleaned_data_sample_10_clients.csv')
     df_raw = pd.read_csv('cleaned_data.csv')
 
     # Для демонстрации создадим фейковые данные
